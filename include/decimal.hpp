@@ -91,9 +91,7 @@ namespace edl
 
             if (dot > 0)
             {
-                if (exponent > 0)
-                    for (std::uint32_t i = 0; i < exponent; ++i) result += '0';
-
+                for (int i = 0; i < exponent; ++i) result += '0';
                 if (static_cast<std::uint32_t>(dot) >= digits) result += ".0";
             }
 
