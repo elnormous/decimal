@@ -9,6 +9,7 @@ namespace edl
     {
         static constexpr std::uint32_t signOffset = 31U;
         static constexpr std::uint32_t exponentOffset = 23U;
+        static constexpr std::uint32_t exponentBias = 127;
         static constexpr std::uint32_t exponentMask = 0xFFU;
         static constexpr std::uint32_t fractionMask = 0x1FFFFFU;
 
@@ -17,7 +18,7 @@ namespace edl
         constexpr decimal(int value, int exponent = 0) noexcept:
             d{
                 (value < 0 ? 0x01U : 0x00U) << signOffset |
-                (exponent < 0 ? 126U - ~static_cast<std::uint32_t>(exponent) & exponentMask : static_cast<std::uint32_t>(exponent + 127) & exponentMask) << exponentOffset |
+                ((exponent < 0 ? (exponentBias - 1 - ~static_cast<std::uint32_t>(exponent)) : (static_cast<std::uint32_t>(exponent) + exponentBias)) & exponentMask) << exponentOffset |
                 ((value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value)) & fractionMask)
             }
         {
