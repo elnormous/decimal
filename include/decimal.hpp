@@ -44,6 +44,24 @@ namespace edl
     private:
         std::uint32_t d = 0;
     };
+
+    inline std::string to_string(const decimal& value)
+    {
+        const auto d = value.data();
+        std::string result;
+        if (d >> 31U) result += '-';
+
+        auto fraction = d & 0x1FFFFFU;
+        do
+        {
+            result += static_cast<char>('0' + fraction % 10U);
+            fraction /= 10U;
+        } while (fraction != 0U);
+
+        result += ".0";
+
+        return result;
+    }
 }
 
 #endif

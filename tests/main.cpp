@@ -101,3 +101,9 @@ TEST_CASE("Negative xponent")
     CHECK((d.data() & 0x1FFFFFU) == 2U); // fraction
 }
 
+TEST_CASE("To string")
+{
+    CHECK(to_string(edl::decimal{0}) == "0.0");
+    CHECK(to_string(edl::decimal{1}) == "1.0");
+    CHECK(to_string(edl::decimal{-1}) == "-1.0");
+}
