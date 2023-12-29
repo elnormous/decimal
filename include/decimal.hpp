@@ -52,20 +52,50 @@ namespace edl
 
     inline std::string to_string(const decimal<32>& value)
     {
-        const auto d = value.data();
+        const auto sign = value.data() >> 31U;
+        const auto exponent = static_cast<int>((value.data() >> 23U) & 0xFFU) - 127;
+        const auto fraction = value.data() & 0x1FFFFFU;
+
         std::string result;
-        if (d >> 31U) result += '-';
-
-        auto fraction = d & 0x1FFFFFU;
-        do
+        if (sign) result += '-';
+        if (fraction == 0U)
         {
-            result += static_cast<char>('0' + fraction % 10U);
-            fraction /= 10U;
-        } while (fraction != 0U);
+            result += "0.0";
+            return result;
+        }
+        else
+        {
+            std::uint32_t digits = 0U;
+            std::uint32_t divisor = 1U;
+            for (std::uint32_t i = fraction; i != 0U; i /= 10U)
+            {
+                ++digits;
+                divisor *= 10U;
+            }
 
-        result += ".0";
+            const auto dot = exponent + static_cast<int>(digits);
+            if (dot <= 0) result += "0.";
+            for (int i = dot; i < 0; ++i) result += '0';
 
-        return result;
+            for (std::uint32_t i = 0U, f = fraction; i < digits; ++i)
+            {
+                divisor /= 10U;
+
+                if (dot > 0 && static_cast<std::uint32_t>(dot + 1) == digits) result += '.';
+                result += static_cast<char>('0' + f / divisor);
+                f %= divisor;
+            }
+
+            if (dot > 0)
+            {
+                if (static_cast<std::uint32_t>(dot) > digits)
+                    for (std::uint32_t i = 0; i < static_cast<std::uint32_t>(dot) - digits; ++i) result += '0';
+
+                result += ".0";
+            }
+
+            return result;
+        }
     }
 }
 

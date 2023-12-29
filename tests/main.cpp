@@ -111,7 +111,14 @@ TEST_CASE("Negative xponent")
 
 TEST_CASE("To string")
 {
-    CHECK(to_string(edl::decimal{0}) == "0.0");
-    CHECK(to_string(edl::decimal{1}) == "1.0");
-    CHECK(to_string(edl::decimal{-1}) == "-1.0");
+    CHECK(to_string(edl::decimal32{0}) == "0.0");
+    CHECK(to_string(edl::decimal32{1}) == "1.0");
+    CHECK(to_string(edl::decimal32{-1}) == "-1.0");
+    CHECK(to_string(edl::decimal32{1, 1}) == "10.0");
+    CHECK(to_string(edl::decimal32{1, -1}) == "0.1");
+    CHECK(to_string(edl::decimal32{1, -2}) == "0.01");
+    CHECK(to_string(edl::decimal32{10, 3}) == "10000.0");
+    CHECK(to_string(edl::decimal32{50, 2}) == "5000.0");
+    CHECK(to_string(edl::decimal32{15, 4}) == "150000.0");
+    CHECK(to_string(edl::decimal32{-15, -4}) == "-0.0015");
 }
