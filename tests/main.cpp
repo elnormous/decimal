@@ -121,4 +121,6 @@ TEST_CASE("To string")
     CHECK(to_string(edl::decimal32{50, 2}) == "5000.0");
     CHECK(to_string(edl::decimal32{15, 4}) == "150000.0");
     CHECK(to_string(edl::decimal32{-15, -4}) == "-0.0015");
+    CHECK(to_string(edl::decimal32{-15, -1}) == "-1.5");
+    CHECK(to_string(edl::decimal32{150, -1}) == "15.0");
 }

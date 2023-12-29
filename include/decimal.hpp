@@ -74,24 +74,27 @@ namespace edl
             }
 
             const auto dot = exponent + static_cast<int>(digits);
-            if (dot <= 0) result += "0.";
-            for (int i = dot; i < 0; ++i) result += '0';
+            if (exponent < 0 && dot <= 0)
+            {
+                result += "0.";
+                for (int i = dot; i < 0; ++i) result += '0';
+            }
 
             for (std::uint32_t i = 0U, f = fraction; i < digits; ++i)
             {
                 divisor /= 10U;
 
-                if (dot > 0 && static_cast<std::uint32_t>(dot + 1) == digits) result += '.';
+                if (dot > 0 && static_cast<std::uint32_t>(dot) == i) result += '.';
                 result += static_cast<char>('0' + f / divisor);
                 f %= divisor;
             }
 
             if (dot > 0)
             {
-                if (static_cast<std::uint32_t>(dot) > digits)
-                    for (std::uint32_t i = 0; i < static_cast<std::uint32_t>(dot) - digits; ++i) result += '0';
+                if (exponent > 0)
+                    for (std::uint32_t i = 0; i < exponent; ++i) result += '0';
 
-                result += ".0";
+                if (static_cast<std::uint32_t>(dot) >= digits) result += ".0";
             }
 
             return result;
