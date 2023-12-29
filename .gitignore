@@ -1,2 +1,3 @@
 ﻿tests/x64
 tests/tests.vcxproj.user
+tests/.vs

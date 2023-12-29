@@ -5,7 +5,9 @@
 
 namespace edl
 {
-    class decimal
+    template<std::size_t size> class decimal;
+
+    template<> class decimal<32U>
     {
         static constexpr std::uint32_t signOffset = 31U;
         static constexpr std::uint32_t exponentOffset = 23U;
@@ -46,7 +48,9 @@ namespace edl
         std::uint32_t d = 0;
     };
 
-    inline std::string to_string(const decimal& value)
+    using decimal32 = decimal<32U>;
+
+    inline std::string to_string(const decimal<32>& value)
     {
         const auto d = value.data();
         std::string result;
