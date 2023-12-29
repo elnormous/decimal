@@ -5,6 +5,14 @@
 TEST_CASE("Default constructor")
 {
     edl::decimal32 d;
+    CHECK(d == 0);
+    CHECK(d != 1);
+    CHECK(d != -1);
+    CHECK(d != -2);
+
+    CHECK(((d.data() >> 31U) & 0x01U) == 0U); // sign
+    CHECK(((d.data() >> 23U) & 0xFFU) == 127U); // exponent
+    CHECK((d.data() & 0x1FFFFFU) == 0U); // fraction
 }
 
 TEST_CASE("Zero")

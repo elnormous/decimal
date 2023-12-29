@@ -45,7 +45,7 @@ namespace edl
         }
 
     private:
-        std::uint32_t d = 0;
+        std::uint32_t d = 127U << exponentOffset;
     };
 
     using decimal32 = decimal<32U>;
