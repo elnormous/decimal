@@ -73,26 +73,26 @@ namespace edl
                 divisor *= 10U;
             }
 
-            const auto dot = exponent + static_cast<int>(digits);
-            if (exponent < 0 && dot <= 0)
+            const auto point = exponent + static_cast<int>(digits);
+            if (exponent < 0 && point <= 0)
             {
                 result += "0.";
-                for (int i = dot; i < 0; ++i) result += '0';
+                for (int i = point; i < 0; ++i) result += '0';
             }
 
             for (std::uint32_t i = 0U, f = significand; i < digits; ++i)
             {
                 divisor /= 10U;
 
-                if (dot > 0 && static_cast<std::uint32_t>(dot) == i) result += '.';
+                if (point > 0 && static_cast<std::uint32_t>(point) == i) result += '.';
                 result += static_cast<char>('0' + f / divisor);
                 f %= divisor;
             }
 
-            if (dot > 0)
+            if (point > 0)
             {
                 for (int i = 0; i < exponent; ++i) result += '0';
-                if (static_cast<std::uint32_t>(dot) >= digits) result += ".0";
+                if (static_cast<std::uint32_t>(point) >= digits) result += ".0";
             }
 
             return result;
