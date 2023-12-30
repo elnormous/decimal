@@ -127,7 +127,7 @@ TEST_CASE("To string")
 
 TEST_CASE("From string")
 {
-    CHECK(edl::stodec32("0.0") == edl::decimal32{0, -1});
-    CHECK(edl::stodec32("-1.0") == edl::decimal32{-10, -1});
-    CHECK(edl::stodec32("-1.5") == edl::decimal32{-15, -1});
+    CHECK(edl::stod32("0.0") == edl::decimal32{0, -1});
+    CHECK(edl::stod32("-1.0") == edl::decimal32{-10, -1});
+    CHECK(edl::stod32("-1.5") == edl::decimal32{-15, -1});
 }

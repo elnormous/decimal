@@ -99,7 +99,7 @@ namespace edl
         }
     }
 
-    inline decimal32 stodec32(const std::string& str, std::size_t* pos = nullptr)
+    inline decimal32 stod32(const std::string& str, std::size_t* pos = nullptr)
     {
         std::size_t i = 0U;
         bool sign = false;
