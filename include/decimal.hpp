@@ -13,7 +13,7 @@ namespace edl
         static constexpr std::uint32_t exponentOffset = 23U;
         static constexpr std::uint32_t exponentBias = 127;
         static constexpr std::uint32_t exponentMask = 0xFFU;
-        static constexpr std::uint32_t fractionMask = 0x1FFFFFU;
+        static constexpr std::uint32_t significandMask = 0x1FFFFFU;
 
     public:
         constexpr decimal() noexcept = default;
@@ -21,7 +21,7 @@ namespace edl
             d{
                 (value < 0 ? 0x01U : 0x00U) << signOffset |
                 ((exponent < 0 ? (exponentBias - 1 - ~static_cast<std::uint32_t>(exponent)) : (static_cast<std::uint32_t>(exponent) + exponentBias)) & exponentMask) << exponentOffset |
-                ((value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value)) & fractionMask)
+                ((value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value)) & significandMask)
             }
         {
         }
@@ -54,11 +54,11 @@ namespace edl
     {
         const auto sign = value.data() >> 31U;
         const auto exponent = static_cast<int>((value.data() >> 23U) & 0xFFU) - 127;
-        const auto fraction = value.data() & 0x1FFFFFU;
+        const auto significand = value.data() & 0x1FFFFFU;
 
         std::string result;
         if (sign) result += '-';
-        if (fraction == 0U)
+        if (significand == 0U)
         {
             result += "0.0";
             return result;
@@ -67,7 +67,7 @@ namespace edl
         {
             std::uint32_t digits = 0U;
             std::uint32_t divisor = 1U;
-            for (std::uint32_t i = fraction; i != 0U; i /= 10U)
+            for (std::uint32_t i = significand; i != 0U; i /= 10U)
             {
                 ++digits;
                 divisor *= 10U;
@@ -80,7 +80,7 @@ namespace edl
                 for (int i = dot; i < 0; ++i) result += '0';
             }
 
-            for (std::uint32_t i = 0U, f = fraction; i < digits; ++i)
+            for (std::uint32_t i = 0U, f = significand; i < digits; ++i)
             {
                 divisor /= 10U;
 
@@ -109,7 +109,7 @@ namespace edl
             ++i;
         }
 
-        int fraction = 0;
+        std::uint32_t significand = 0U;
         int exponent = 0;
 
         for (; i < str.size(); ++i)
@@ -122,7 +122,7 @@ namespace edl
                 {
                     if (str[i] < '0' || str[i] > '9') break;
 
-                    fraction = fraction * 10 + static_cast<int>(str[i] - '0');
+                    significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
                     --exponent;
                 }
 
@@ -131,14 +131,12 @@ namespace edl
 
             if (str[i] < '0' || str[i] > '9') break;
 
-            fraction = fraction * 10 + static_cast<int>(str[i] - '0');
+            significand = significand * 10 + static_cast<int>(str[i] - '0');
         }
-
-        if (sign) fraction = -fraction;
 
         if (pos) *pos = i;
 
-        return decimal32{fraction, exponent};
+        return decimal32{sign ? -static_cast<int>(significand) : static_cast<int>(significand), exponent};
     }
 }
 
