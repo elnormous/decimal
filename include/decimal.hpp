@@ -98,6 +98,48 @@ namespace edl
             return result;
         }
     }
+
+    inline decimal32 stodec32(const std::string& str, std::size_t* pos = nullptr)
+    {
+        std::size_t i = 0U;
+        bool sign = false;
+        if (str[i] == '-')
+        {
+            sign = true;
+            ++i;
+        }
+
+        int fraction = 0;
+        int exponent = 0;
+
+        for (; i < str.size(); ++i)
+        {
+            if (str[i] == '.')
+            {
+                ++i;
+
+                for (; i < str.size(); ++i)
+                {
+                    if (str[i] < '0' || str[i] > '9') break;
+
+                    fraction = fraction * 10 + static_cast<int>(str[i] - '0');
+                    --exponent;
+                }
+
+                break;
+            }
+
+            if (str[i] < '0' || str[i] > '9') break;
+
+            fraction = fraction * 10 + static_cast<int>(str[i] - '0');
+        }
+
+        if (sign) fraction = -fraction;
+
+        if (pos) *pos = i;
+
+        return decimal32{fraction, exponent};
+    }
 }
 
 #endif

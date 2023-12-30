@@ -90,7 +90,7 @@ TEST_CASE("Exponent")
     CHECK((d.data() & 0x1FFFFFU) == 2U); // fraction
 }
 
-TEST_CASE("Negative xponent")
+TEST_CASE("Negative exponent")
 {
     edl::decimal32 d{-2, -1};
     CHECK(d != 0);
@@ -123,4 +123,11 @@ TEST_CASE("To string")
     CHECK(to_string(edl::decimal32{-15, -4}) == "-0.0015");
     CHECK(to_string(edl::decimal32{-15, -1}) == "-1.5");
     CHECK(to_string(edl::decimal32{150, -1}) == "15.0");
+}
+
+TEST_CASE("From string")
+{
+    CHECK(edl::stodec32("0.0") == edl::decimal32{0, -1});
+    CHECK(edl::stodec32("-1.0") == edl::decimal32{-10, -1});
+    CHECK(edl::stodec32("-1.5") == edl::decimal32{-15, -1});
 }
