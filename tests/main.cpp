@@ -75,6 +75,7 @@ TEST_CASE("Negation")
 {
     CHECK(-edl::decimal32{1} == edl::decimal32{-1});
     CHECK(-edl::decimal32{1, 10} == edl::decimal32{-1, 10});
+    CHECK(-edl::decimal32{-1, 10} == edl::decimal32{1, 10});
 }
 
 TEST_CASE("Exponent")
