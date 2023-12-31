@@ -39,6 +39,13 @@ namespace edl
             return d != other.d;
         }
 
+        [[nodiscard]] constexpr decimal operator-() const noexcept
+        {
+            decimal result = *this;
+            result.d ^= (1U << signOffset);
+            return result;
+        }
+
         [[nodiscard]] constexpr std::uint32_t data() const noexcept
         {
             return d;

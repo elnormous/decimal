@@ -71,6 +71,12 @@ TEST_CASE("Minus two")
     CHECK((d.data() & 0x1FFFFFU) == 2U); // fraction
 }
 
+TEST_CASE("Negation")
+{
+    CHECK(-edl::decimal32{1} == edl::decimal32{-1});
+    CHECK(-edl::decimal32{1, 10} == edl::decimal32{-1, 10});
+}
+
 TEST_CASE("Exponent")
 {
     edl::decimal32 d{-2, 1};
