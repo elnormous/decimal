@@ -121,27 +121,25 @@ namespace edl
 
         for (; i < str.size(); ++i)
         {
-            if (str[i] == '.')
-            {
-                ++i;
-
-                for (; i < str.size(); ++i)
-                {
-                    if (str[i] < '0' || str[i] > '9') break;
-
-                    significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
-                    --exponent;
-                }
-
-                break;
-            }
-
             if (str[i] < '0' || str[i] > '9') break;
 
             if (significand * 10U + static_cast<std::uint32_t>(str[i] - '0') < 0x1FFFFFU)
                 significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
             else
                 ++exponent;
+        }
+
+        if (str[i] == '.')
+        {
+            ++i;
+
+            for (; i < str.size(); ++i)
+            {
+                if (str[i] < '0' || str[i] > '9') break;
+
+                significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
+                --exponent;
+            }
         }
 
         if (pos) *pos = i;
