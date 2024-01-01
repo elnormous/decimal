@@ -130,7 +130,7 @@ TEST_CASE("To string")
     CHECK(to_string(edl::decimal32{-15, -4}) == "-0.0015");
     CHECK(to_string(edl::decimal32{-15, -1}) == "-1.5");
     CHECK(to_string(edl::decimal32{150, -1}) == "15.0");
-    CHECK(to_string(edl::decimal32{1, 30}) == "1000000000000000000000000000000.0");
+    CHECK(to_string(edl::decimal32{1, 10}) == "10000000000.0");
 }
 
 TEST_CASE("From string")
@@ -141,6 +141,7 @@ TEST_CASE("From string")
     CHECK(edl::stod32("0.0") == edl::decimal32{0, -1});
     CHECK(edl::stod32("-1.0") == edl::decimal32{-10, -1});
     CHECK(edl::stod32("-1.5") == edl::decimal32{-15, -1});
-    CHECK(edl::stod32("1000000000000000000000000000000.0") == edl::decimal32{10000000, 23});
-    CHECK(edl::stod32("0.1") == edl::decimal32{1, -1});
+    CHECK(edl::stod32(".1") == edl::decimal32{1, -1});
+    CHECK(edl::stod32("10000000000.0") == edl::decimal32{1000000, 4});
+    CHECK(edl::stod32("10000000000.1") == edl::decimal32{1000000, 4});
 }

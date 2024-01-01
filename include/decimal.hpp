@@ -137,8 +137,11 @@ namespace edl
             {
                 if (str[i] < '0' || str[i] > '9') break;
 
-                significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
-                --exponent;
+                if (exponent <= 0)
+                {
+                    significand = significand * 10U + static_cast<std::uint32_t>(str[i] - '0');
+                    --exponent;
+                }
             }
         }
 
