@@ -144,4 +144,6 @@ TEST_CASE("From string")
     CHECK(edl::stod32(".1") == edl::decimal32{1, -1});
     CHECK(edl::stod32("10000000000.0") == edl::decimal32{1000000, 4});
     CHECK(edl::stod32("10000000000.1") == edl::decimal32{1000000, 4});
+    CHECK(edl::stod32("209715100.1") == edl::decimal32{2097151, 2});
+    CHECK(edl::stod32("-209715100.1") == edl::decimal32{-2097151, 2});
 }
