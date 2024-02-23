@@ -7,7 +7,7 @@ namespace edl
 {
     template<std::size_t size> class decimal;
 
-    template<> class decimal<32U>
+    template<> class decimal<32U> final
     {
         static constexpr std::uint32_t signOffset = 31U;
         static constexpr std::uint32_t exponentOffset = 23U;
