@@ -5,9 +5,7 @@
 
 namespace edl
 {
-    template<std::size_t size> class decimal;
-
-    template<> class decimal<32U> final
+    class decimal32 final
     {
         static constexpr std::uint32_t signOffset = 31U;
         static constexpr std::uint32_t exponentOffset = 23U;
@@ -16,8 +14,8 @@ namespace edl
         static constexpr std::uint32_t significandMask = 0x1FFFFFU;
 
     public:
-        constexpr decimal() noexcept = default;
-        constexpr decimal(int value, int exponent = 0) noexcept:
+        constexpr decimal32() noexcept = default;
+        constexpr decimal32(int value, int exponent = 0) noexcept:
             d{
                 (value < 0 ? 0x01U : 0x00U) << signOffset |
                 ((exponent < 0 ? (exponentBias - 1 - ~static_cast<std::uint32_t>(exponent)) : (static_cast<std::uint32_t>(exponent) + exponentBias)) & exponentMask) << exponentOffset |
@@ -26,22 +24,22 @@ namespace edl
         {
         }
 
-        constexpr decimal(const decimal&) = default;
-        constexpr decimal(decimal&&) = default;
+        constexpr decimal32(const decimal32&) = default;
+        constexpr decimal32(decimal32&&) = default;
 
-        [[nodiscard]] constexpr bool operator==(const decimal& other) const noexcept
+        [[nodiscard]] constexpr bool operator==(const decimal32& other) const noexcept
         {
             return d == other.d;
         }
 
-        [[nodiscard]] constexpr bool operator!=(const decimal& other) const noexcept
+        [[nodiscard]] constexpr bool operator!=(const decimal32& other) const noexcept
         {
             return d != other.d;
         }
 
-        [[nodiscard]] constexpr decimal operator-() const noexcept
+        [[nodiscard]] constexpr decimal32 operator-() const noexcept
         {
-            decimal result = *this;
+            decimal32 result = *this;
             result.d ^= (1U << signOffset);
             return result;
         }
@@ -55,9 +53,7 @@ namespace edl
         std::uint32_t d = 127U << exponentOffset;
     };
 
-    using decimal32 = decimal<32U>;
-
-    inline std::string to_string(const decimal<32>& value)
+    inline std::string to_string(const decimal32& value)
     {
         const auto sign = value.data() >> 31U;
         const auto exponent = static_cast<int>((value.data() >> 23U) & 0xFFU) - 127;
