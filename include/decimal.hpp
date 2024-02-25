@@ -7,19 +7,19 @@ namespace edl
 {
     class decimal32 final
     {
-        static constexpr std::uint32_t signOffset = 31U;
-        static constexpr std::uint32_t exponentOffset = 23U;
-        static constexpr std::uint32_t exponentBias = 127;
-        static constexpr std::uint32_t exponentMask = 0xFFU;
-        static constexpr std::uint32_t significandMask = 0x1FFFFFU;
+        static constexpr std::uint32_t sign_offset = 31U;
+        static constexpr std::uint32_t exponent_offset = 23U;
+        static constexpr std::int32_t exponent_bias = 127;
+        static constexpr std::uint32_t exponent_mask = 0xFFU;
+        static constexpr std::uint32_t significand_mask = 0x1FFFFFU;
 
     public:
         constexpr decimal32() noexcept = default;
-        constexpr decimal32(int value, int exponent = 0) noexcept:
+        constexpr decimal32(std::int32_t value, std::int32_t exponent = 0) noexcept:
             d{
-                (value < 0 ? 0x01U : 0x00U) << signOffset |
-                ((exponent < 0 ? (exponentBias - 1 - ~static_cast<std::uint32_t>(exponent)) : (static_cast<std::uint32_t>(exponent) + exponentBias)) & exponentMask) << exponentOffset |
-                ((value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value)) & significandMask)
+                (value < 0 ? 0x01U : 0x00U) << sign_offset |
+                ((exponent < 0 ? (exponent_bias - 1 - ~static_cast<std::uint32_t>(exponent)) : (exponent + exponent_bias)) & exponent_mask) << exponent_offset |
+                ((value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value)) & significand_mask)
             }
         {
         }
@@ -40,7 +40,9 @@ namespace edl
         [[nodiscard]] constexpr decimal32 operator-() const noexcept
         {
             decimal32 result = *this;
-            result.d ^= (1U << signOffset);
+            result.d ^= (1U << sign_offset);
+            return result;
+        }
             return result;
         }
 
@@ -50,13 +52,13 @@ namespace edl
         }
 
     private:
-        std::uint32_t d = 127U << exponentOffset;
+        std::uint32_t d = 127U << exponent_offset;
     };
 
     inline std::string to_string(const decimal32& value)
     {
         const auto sign = value.data() >> 31U;
-        const auto exponent = static_cast<int>((value.data() >> 23U) & 0xFFU) - 127;
+        const auto exponent = static_cast<std::int32_t>((value.data() >> 23U) & 0xFFU) - 127;
         const auto significand = value.data() & 0x1FFFFFU;
 
         std::string result;
@@ -76,7 +78,7 @@ namespace edl
                 divisor *= 10U;
             }
 
-            const auto point = exponent + static_cast<int>(digits);
+            const auto point = exponent + static_cast<std::int32_t>(digits);
             if (exponent < 0 && point <= 0)
             {
                 result += "0.";
@@ -143,7 +145,7 @@ namespace edl
 
         if (pos) *pos = i;
 
-        return decimal32{sign ? -static_cast<int>(significand) : static_cast<int>(significand), exponent};
+        return decimal32{sign ? -static_cast<std::int32_t>(significand) : static_cast<std::int32_t>(significand), exponent};
     }
 }
 
