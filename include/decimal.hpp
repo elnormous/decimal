@@ -43,7 +43,21 @@ namespace edl
             result.d ^= (1U << sign_offset);
             return result;
         }
-            return result;
+
+        [[nodiscard]] constexpr decimal32 operator+(decimal32 other) const noexcept
+        {
+            const auto other_sign = other.d >> sign_offset;
+            const auto other_exponent = static_cast<std::int32_t>((other.d >> exponent_offset) & exponent_mask) - exponent_bias;
+            const auto other_significand = other.d & significand_mask;
+
+            const auto sign = d >> sign_offset;
+            const auto exponent = static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias;
+            const auto significand = d & significand_mask;
+
+            if (exponent == other_exponent)
+                return decimal32{(sign ? -static_cast<std::int32_t>(significand) : static_cast<std::int32_t>(significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), exponent};
+
+            return other;
         }
 
         [[nodiscard]] constexpr std::uint32_t data() const noexcept

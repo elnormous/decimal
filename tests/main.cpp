@@ -116,6 +116,15 @@ TEST_CASE("Negative exponent")
     CHECK((d.data() & 0x1FFFFFU) == 2U); // fraction
 }
 
+TEST_CASE("Addition")
+{
+	CHECK(edl::decimal32{1} + edl::decimal32{1} == edl::decimal32{2});
+    CHECK(edl::decimal32{1} + edl::decimal32{-1} == edl::decimal32{0});
+    CHECK(edl::decimal32{-2} + edl::decimal32{1} == edl::decimal32{-1});
+    CHECK(edl::decimal32{-2} + edl::decimal32{-1} == edl::decimal32{-3});
+    CHECK(edl::decimal32{-2, 10} + edl::decimal32{1, 10} == edl::decimal32{-1, 10});
+}
+
 TEST_CASE("To string")
 {
     CHECK(to_string(edl::decimal32{0}) == "0.0");
