@@ -46,18 +46,24 @@ namespace edl
 
         [[nodiscard]] constexpr decimal32 operator+(decimal32 other) const noexcept
         {
+            const auto self_sign = sign();
+            const auto self_exponent = exponent();
+            const auto self_significand = significand();
+
             const auto other_sign = other.sign();
             const auto other_exponent = other.exponent();
             const auto other_significand = other.significand();
 
-            const auto this_sign = sign();
-            const auto this_exponent = exponent();
-            const auto this_significand = significand();
+            if (self_significand == 0)
+                return other;
 
-            if (this_exponent == other_exponent)
-                return decimal32{(this_sign ? -static_cast<std::int32_t>(this_significand) : static_cast<std::int32_t>(this_significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), this_exponent};
+            if (other_significand == 0)
+                return *this;
 
-            return other;
+            if (self_exponent == other_exponent)
+                return decimal32{(self_sign ? -static_cast<std::int32_t>(self_significand) : static_cast<std::int32_t>(self_significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), self_exponent};
+
+            return *this;
         }
 
         [[nodiscard]] constexpr std::uint32_t data() const noexcept

@@ -118,6 +118,8 @@ TEST_CASE("Negative exponent")
 
 TEST_CASE("Addition")
 {
+    CHECK(edl::decimal32{0} + edl::decimal32{1, 10} == edl::decimal32{1, 10});
+    CHECK(edl::decimal32{1, 10} + edl::decimal32{0} == edl::decimal32{1, 10});
 	CHECK(edl::decimal32{1} + edl::decimal32{1} == edl::decimal32{2});
     CHECK(edl::decimal32{1} + edl::decimal32{-1} == edl::decimal32{0});
     CHECK(edl::decimal32{-2} + edl::decimal32{1} == edl::decimal32{-1});
