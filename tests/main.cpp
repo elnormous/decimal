@@ -17,7 +17,7 @@ TEST_CASE("Default constructor")
 
 TEST_CASE("Zero")
 {
-    edl::decimal32 d{0};
+    edl::decimal32 d{0, 0, false};
     CHECK(d == 0);
     CHECK(d != 1);
     CHECK(d != -1);
@@ -30,7 +30,7 @@ TEST_CASE("Zero")
 
 TEST_CASE("One")
 {
-    edl::decimal32 d{1};
+    edl::decimal32 d{1, 0, false};
     CHECK(d != 0);
     CHECK(d == 1);
     CHECK(d != -1);
@@ -43,7 +43,7 @@ TEST_CASE("One")
 
 TEST_CASE("Minus one")
 {
-    edl::decimal32 d{-1};
+    edl::decimal32 d{-1, 0};
     CHECK(d != 0);
     CHECK(d != 1);
     CHECK(d == -1);
@@ -94,7 +94,7 @@ TEST_CASE("Exponent")
 
     CHECK(((d.data() >> 31U) & 0x01U) == 1U); // sign
     CHECK(((d.data() >> 23U) & 0xFFU) == 128U); // exponent
-    CHECK((d.data() & 0x1FFFFFU) == 2U); // fraction
+    CHECK((d.data() & 0x1FFFFFU) == 2U); // significand
 }
 
 TEST_CASE("Negative exponent")
@@ -125,6 +125,17 @@ TEST_CASE("Addition")
     CHECK(edl::decimal32{-2} + edl::decimal32{1} == edl::decimal32{-1});
     CHECK(edl::decimal32{-2} + edl::decimal32{-1} == edl::decimal32{-3});
     CHECK(edl::decimal32{-2, 10} + edl::decimal32{1, 10} == edl::decimal32{-1, 10});
+}
+
+TEST_CASE("Subtraction")
+{
+    CHECK(edl::decimal32{0, 10} - edl::decimal32{1, 10} == edl::decimal32{-1, 10});
+    CHECK(edl::decimal32{1, 10} + edl::decimal32{0} == edl::decimal32{1, 10});
+    CHECK(edl::decimal32{1} - edl::decimal32{1} == edl::decimal32{0});
+    CHECK(edl::decimal32{1} - edl::decimal32{-1} == edl::decimal32{2});
+    CHECK(edl::decimal32{-2} - edl::decimal32{1} == edl::decimal32{-3});
+    CHECK(edl::decimal32{-2} - edl::decimal32{-1} == edl::decimal32{-1});
+    CHECK(edl::decimal32{-2, 10} - edl::decimal32{1, 10} == edl::decimal32{-3, 10});
 }
 
 TEST_CASE("To string")
