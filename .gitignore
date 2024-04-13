@@ -5,3 +5,8 @@ tests/tests.xcodeproj/project.xcworkspace/xcshareddata
 tests/tests.xcodeproj/project.xcworkspace/xcuserdata
 tests/tests.xcodeproj/xcshareddata
 tests/tests.xcodeproj/xcuserdata
+tests/tests/x64
+tests/Debug
+tests/Release
+tests/tests/Debug
+tests/tests/Release
