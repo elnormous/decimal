@@ -46,16 +46,16 @@ namespace edl
 
         [[nodiscard]] constexpr decimal32 operator+(decimal32 other) const noexcept
         {
-            const auto other_sign = other.d >> sign_offset;
-            const auto other_exponent = static_cast<std::int32_t>((other.d >> exponent_offset) & exponent_mask) - exponent_bias;
-            const auto other_significand = other.d & significand_mask;
+            const auto other_sign = other.sign();
+            const auto other_exponent = other.exponent();
+            const auto other_significand = other.significand();
 
-            const auto sign = d >> sign_offset;
-            const auto exponent = static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias;
-            const auto significand = d & significand_mask;
+            const auto this_sign = sign();
+            const auto this_exponent = exponent();
+            const auto this_significand = significand();
 
-            if (exponent == other_exponent)
-                return decimal32{(sign ? -static_cast<std::int32_t>(significand) : static_cast<std::int32_t>(significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), exponent};
+            if (this_exponent == other_exponent)
+                return decimal32{(this_sign ? -static_cast<std::int32_t>(this_significand) : static_cast<std::int32_t>(this_significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), this_exponent};
 
             return other;
         }
@@ -66,6 +66,10 @@ namespace edl
         }
 
     private:
+        constexpr auto sign() const noexcept { return d >> sign_offset; }
+        constexpr auto exponent() const noexcept { return static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias; }
+        constexpr auto significand() const noexcept { return d & significand_mask; }
+
         std::uint32_t d = 127U << exponent_offset;
     };
 
