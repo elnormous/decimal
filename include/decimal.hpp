@@ -5,63 +5,83 @@
 
 namespace edl
 {
-    class decimal32 final
+    template<std::size_t size> struct traits;
+
+    template<> struct traits<32U>
     {
+        using unsigned_type = std::uint32_t;
+        using signed_type = std::int32_t;
         static constexpr std::uint32_t sign_offset = 31U;
         static constexpr std::uint32_t exponent_offset = 23U;
         static constexpr std::int32_t exponent_bias = 127;
         static constexpr std::uint32_t exponent_mask = 0xFFU;
-        static constexpr std::uint32_t significand_mask = 0x1FFFFFU;
+        static constexpr std::uint32_t significand_mask = 0x7FFFFFU;
+    };
 
-        constexpr auto sign() const noexcept { return static_cast<bool>(d >> sign_offset); }
-        constexpr auto exponent() const noexcept { return static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias; }
-        constexpr auto significand() const noexcept { return d & significand_mask; }
+    template<> struct traits<64U>
+    {
+        using unsigned_type = std::uint64_t;
+        using signed_type = std::int64_t;
+        static constexpr std::uint64_t sign_offset = 63U;
+        static constexpr std::uint64_t exponent_offset = 52U;
+        static constexpr std::int64_t exponent_bias = 1023;
+        static constexpr std::uint64_t exponent_mask = 0x7FFU;
+        static constexpr std::uint64_t significand_mask = 0xFFFFFFFFFFFFFU;
+    };
 
-        std::uint32_t d = 127U << exponent_offset;
+    template<std::size_t size>
+    class decimal final
+    {
+        constexpr auto sign() const noexcept { return static_cast<bool>(d >> traits<size>::sign_offset); }
+        constexpr auto exponent() const noexcept { return static_cast<typename traits<size>::signed_type>((d >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias; }
+        constexpr auto significand() const noexcept { return d & traits<size>::significand_mask; }
+
+        typename traits<size>::unsigned_type d = static_cast<typename traits<size>::unsigned_type>(traits<size>::exponent_bias) << traits<size>::exponent_offset;
 
     public:
-        constexpr decimal32() noexcept = default;
+        constexpr decimal() noexcept = default;
 
-        constexpr decimal32(std::uint32_t signif, std::int32_t exp, bool sig) noexcept:
+        constexpr decimal(typename traits<size>::unsigned_type signif, typename traits<size>::signed_type exp, bool sig) noexcept:
             d{
-                (sig ? 0x01U : 0x00U) << sign_offset |
-                ((exp < 0 ? (exponent_bias - 1U - ~static_cast<std::uint32_t>(exp)) : (static_cast<std::uint32_t>(exp) + exponent_bias)) & exponent_mask) << exponent_offset |
-                (signif & significand_mask)
-        }
+                (sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
+                ((exp < 0 ?
+                  (traits<size>::exponent_bias - 1U - ~static_cast<typename traits<size>::unsigned_type>(exp)) :
+                  (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (signif & traits<size>::significand_mask)
+            }
         {
         }
 
-        constexpr decimal32(std::int32_t value, std::int32_t exp) noexcept:
-            decimal32{value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value), exp, value < 0}
+        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
+            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
         {
         }
 
-        constexpr decimal32(std::int32_t value) noexcept:
-            decimal32{value < 0 ? ~static_cast<std::uint32_t>(value) + 0x01U : static_cast<std::uint32_t>(value), 0U, value < 0}
+        constexpr decimal(typename traits<size>::signed_type value) noexcept:
+            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), 0U, value < 0}
         {
         }
 
-        constexpr decimal32(const decimal32&) = default;
-        constexpr decimal32(decimal32&&) = default;
+        constexpr decimal(const decimal&) = default;
+        constexpr decimal(decimal&&) = default;
 
-        [[nodiscard]] constexpr bool operator==(const decimal32& other) const noexcept
+        [[nodiscard]] constexpr bool operator==(const decimal& other) const noexcept
         {
             return d == other.d;
         }
 
-        [[nodiscard]] constexpr bool operator!=(const decimal32& other) const noexcept
+        [[nodiscard]] constexpr bool operator!=(const decimal& other) const noexcept
         {
             return d != other.d;
         }
 
-        [[nodiscard]] constexpr decimal32 operator-() const noexcept
+        [[nodiscard]] constexpr decimal operator-() const noexcept
         {
-            decimal32 result = *this;
-            result.d ^= (1U << sign_offset);
+            decimal result = *this;
+            result.d ^= (1U << traits<size>::sign_offset);
             return result;
         }
 
-        [[nodiscard]] constexpr decimal32 operator+(decimal32 other) const noexcept
+        [[nodiscard]] constexpr decimal operator+(decimal other) const noexcept
         {
             const auto self_sign = sign();
             const auto self_exponent = exponent();
@@ -78,12 +98,14 @@ namespace edl
                 return *this;
 
             if (self_exponent == other_exponent)
-                return decimal32{(self_sign ? -static_cast<std::int32_t>(self_significand) : static_cast<std::int32_t>(self_significand)) + (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), self_exponent};
+                return decimal{(self_sign ?
+                                -static_cast<typename traits<size>::signed_type>(self_significand) :
+                                static_cast<typename traits<size>::signed_type>(self_significand)) + (other_sign ? -static_cast<typename traits<size>::signed_type>(other_significand) : static_cast<typename traits<size>::signed_type>(other_significand)), self_exponent};
 
             return *this;
         }
 
-        [[nodiscard]] constexpr decimal32 operator-(decimal32 other) const noexcept
+        [[nodiscard]] constexpr decimal operator-(decimal other) const noexcept
         {
             const auto self_sign = sign();
             const auto self_exponent = exponent();
@@ -94,27 +116,33 @@ namespace edl
             const auto other_significand = other.significand();
 
             if (self_significand == 0)
-                return decimal32{other_significand, self_exponent, !other_sign};
+                return decimal{other_significand, self_exponent, !other_sign};
 
             if (other_significand == 0)
                 return *this;
 
             if (self_exponent == other_exponent)
-                return decimal32{(self_sign ? -static_cast<std::int32_t>(self_significand) : static_cast<std::int32_t>(self_significand)) - (other_sign ? -static_cast<std::int32_t>(other_significand) : static_cast<std::int32_t>(other_significand)), self_exponent};
+                return decimal{(self_sign ?
+                                -static_cast<typename traits<size>::signed_type>(self_significand) :
+                                static_cast<typename traits<size>::signed_type>(self_significand)) - (other_sign ? -static_cast<typename traits<size>::signed_type>(other_significand) : static_cast<typename traits<size>::signed_type>(other_significand)), self_exponent};
 
             return *this;
         }
 
-        [[nodiscard]] constexpr std::uint32_t data() const noexcept
+        [[nodiscard]] constexpr auto data() const noexcept
         {
             return d;
         }
     };
 
-    inline std::string to_string(const decimal32& value)
+    using decimal32 = decimal<32U>;
+    using decimal64 = decimal<64U>;
+
+    template<std::size_t size>
+    inline std::string to_string(const decimal<size>& value)
     {
         const auto sign = value.data() >> 31U;
-        const auto exponent = static_cast<std::int32_t>((value.data() >> 23U) & 0xFFU) - 127;
+        const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> 23U) & 0xFFU) - 127;
         const auto significand = value.data() & 0x1FFFFFU;
 
         std::string result;
