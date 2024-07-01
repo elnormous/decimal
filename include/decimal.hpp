@@ -13,13 +13,19 @@ namespace edl
         static constexpr std::uint32_t exponent_mask = 0xFFU;
         static constexpr std::uint32_t significand_mask = 0x1FFFFFU;
 
+        constexpr auto sign() const noexcept { return static_cast<bool>(d >> sign_offset); }
+        constexpr auto exponent() const noexcept { return static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias; }
+        constexpr auto significand() const noexcept { return d & significand_mask; }
+
+        std::uint32_t d = 127U << exponent_offset;
+
     public:
         constexpr decimal32() noexcept = default;
 
         constexpr decimal32(std::uint32_t signif, std::int32_t exp, bool sig) noexcept:
             d{
                 (sig ? 0x01U : 0x00U) << sign_offset |
-                ((exp < 0 ? (exponent_bias - 1 - ~static_cast<std::uint32_t>(exp)) : (exp + exponent_bias)) & exponent_mask) << exponent_offset |
+                ((exp < 0 ? (exponent_bias - 1U - ~static_cast<std::uint32_t>(exp)) : (static_cast<std::uint32_t>(exp) + exponent_bias)) & exponent_mask) << exponent_offset |
                 (signif & significand_mask)
         }
         {
@@ -103,13 +109,6 @@ namespace edl
         {
             return d;
         }
-
-    private:
-        constexpr auto sign() const noexcept { return static_cast<bool>(d >> sign_offset); }
-        constexpr auto exponent() const noexcept { return static_cast<std::int32_t>((d >> exponent_offset) & exponent_mask) - exponent_bias; }
-        constexpr auto significand() const noexcept { return d & significand_mask; }
-
-        std::uint32_t d = 127U << exponent_offset;
     };
 
     inline std::string to_string(const decimal32& value)
