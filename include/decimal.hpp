@@ -142,7 +142,7 @@ namespace edl
     inline std::string to_string(const decimal<size>& value)
     {
         const auto sign = value.data() >> 31U;
-        const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> traits<size>::exponent_offset) & 0xFFU) - 127;
+        const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias;
         const auto significand = value.data() & 0x1FFFFFU;
 
         std::string result;
