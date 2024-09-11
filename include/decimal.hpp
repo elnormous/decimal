@@ -41,6 +41,11 @@ namespace edl
     public:
         constexpr decimal() noexcept = default;
 
+        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
+            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
+        {
+        }
+
         constexpr decimal(typename traits<size>::unsigned_type signif, typename traits<size>::signed_type exp, bool sig) noexcept:
             d{
                 (sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
@@ -48,11 +53,6 @@ namespace edl
                   (traits<size>::exponent_bias - 1U - ~static_cast<typename traits<size>::unsigned_type>(exp)) :
                   (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (signif & traits<size>::significand_mask)
             }
-        {
-        }
-
-        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
-            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
         {
         }
 
@@ -187,6 +187,28 @@ namespace edl
             return result;
         }
     }
+
+    template<class T> class numeric_limits;
+
+    template<> class numeric_limits<decimal32>
+    {
+        static constexpr bool is_signed = true;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr bool has_infinity = true;
+
+        static constexpr decimal64 min() noexcept { return decimal64{1, 0}; }
+    };
+
+    template<> class numeric_limits<decimal64>
+    {
+        static constexpr bool is_signed = true;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr bool has_infinity = true;
+
+        static constexpr decimal64 min() noexcept { return decimal64{1, 0}; }
+    };
 
     template<std::size_t size>
     constexpr bool isnormal(const decimal<size>& value)
