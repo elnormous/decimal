@@ -11,22 +11,22 @@ namespace edl
     {
         using unsigned_type = std::uint32_t;
         using signed_type = std::int32_t;
-        static constexpr std::uint32_t sign_offset = 31U;
-        static constexpr std::uint32_t exponent_offset = 23U;
-        static constexpr std::int32_t exponent_bias = 127;
-        static constexpr std::uint32_t exponent_mask = 0xFFU;
-        static constexpr std::uint32_t significand_mask = 0x7FFFFFU;
+        static constexpr unsigned_type sign_offset = 31U;
+        static constexpr unsigned_type exponent_offset = 23U;
+        static constexpr signed_type exponent_bias = 127;
+        static constexpr unsigned_type exponent_mask = 0xFFU;
+        static constexpr unsigned_type significand_mask = 0x7FFFFFU;
     };
 
     template<> struct traits<64U>
     {
         using unsigned_type = std::uint64_t;
         using signed_type = std::int64_t;
-        static constexpr std::uint64_t sign_offset = 63U;
-        static constexpr std::uint64_t exponent_offset = 52U;
-        static constexpr std::int64_t exponent_bias = 1023;
-        static constexpr std::uint64_t exponent_mask = 0x7FFU;
-        static constexpr std::uint64_t significand_mask = 0xFFFFFFFFFFFFFU;
+        static constexpr unsigned_type sign_offset = 63U;
+        static constexpr unsigned_type exponent_offset = 52U;
+        static constexpr signed_type exponent_bias = 1023;
+        static constexpr unsigned_type exponent_mask = 0x7FFU;
+        static constexpr unsigned_type significand_mask = 0xFFFFFFFFFFFFFU;
     };
 
     template<std::size_t size>
