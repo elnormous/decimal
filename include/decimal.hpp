@@ -197,7 +197,7 @@ namespace edl
         static constexpr bool is_exact = false;
         static constexpr bool has_infinity = true;
 
-        static constexpr decimal64 min() noexcept { return decimal64{1, 0}; }
+        static constexpr decimal32 min() noexcept { return decimal32{1, 0}; }
     };
 
     template<> class numeric_limits<decimal64>
