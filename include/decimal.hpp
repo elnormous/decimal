@@ -188,6 +188,12 @@ namespace edl
         }
     }
 
+    template<std::size_t size>
+    constexpr bool isnormal(const decimal<size>& value)
+    {
+        const auto exponent = (value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask;
+        return exponent != traits<size>::exponent_mask;
+    }
     inline decimal32 stod32(const std::string& str, std::size_t* pos = nullptr)
     {
         std::size_t i = 0U;
