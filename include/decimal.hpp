@@ -48,7 +48,7 @@ namespace edl
 
         constexpr decimal(typename traits<size>::unsigned_type signif, typename traits<size>::signed_type exp, bool sig) noexcept:
             d{
-                (sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
+                static_cast<typename traits<size>::unsigned_type>(sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
                 ((exp < 0 ?
                   (traits<size>::exponent_bias - 1U - ~static_cast<typename traits<size>::unsigned_type>(exp)) :
                   (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (signif & traits<size>::significand_mask)
