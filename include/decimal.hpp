@@ -11,22 +11,22 @@ namespace edl
     {
         using unsigned_type = std::uint32_t;
         using signed_type = std::int32_t;
-        static constexpr std::uint32_t sign_offset = 31U;
-        static constexpr std::uint32_t exponent_offset = 23U;
-        static constexpr std::int32_t exponent_bias = 127;
-        static constexpr std::uint32_t exponent_mask = 0xFFU;
-        static constexpr std::uint32_t significand_mask = 0x7FFFFFU;
+        static constexpr unsigned_type sign_offset = 31U;
+        static constexpr unsigned_type exponent_offset = 23U;
+        static constexpr signed_type exponent_bias = 127;
+        static constexpr unsigned_type exponent_mask = 0xFFU;
+        static constexpr unsigned_type significand_mask = 0x7FFFFFU;
     };
 
     template<> struct traits<64U>
     {
         using unsigned_type = std::uint64_t;
         using signed_type = std::int64_t;
-        static constexpr std::uint64_t sign_offset = 63U;
-        static constexpr std::uint64_t exponent_offset = 52U;
-        static constexpr std::int64_t exponent_bias = 1023;
-        static constexpr std::uint64_t exponent_mask = 0x7FFU;
-        static constexpr std::uint64_t significand_mask = 0xFFFFFFFFFFFFFU;
+        static constexpr unsigned_type sign_offset = 63U;
+        static constexpr unsigned_type exponent_offset = 52U;
+        static constexpr signed_type exponent_bias = 1023;
+        static constexpr unsigned_type exponent_mask = 0x7FFU;
+        static constexpr unsigned_type significand_mask = 0xFFFFFFFFFFFFFU;
     };
 
     template<std::size_t size>
@@ -41,6 +41,11 @@ namespace edl
     public:
         constexpr decimal() noexcept = default;
 
+        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
+            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
+        {
+        }
+
         constexpr decimal(typename traits<size>::unsigned_type signif, typename traits<size>::signed_type exp, bool sig) noexcept:
             d{
                 (sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
@@ -48,11 +53,6 @@ namespace edl
                   (traits<size>::exponent_bias - 1U - ~static_cast<typename traits<size>::unsigned_type>(exp)) :
                   (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (signif & traits<size>::significand_mask)
             }
-        {
-        }
-
-        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
-            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
         {
         }
 
@@ -142,7 +142,7 @@ namespace edl
     inline std::string to_string(const decimal<size>& value)
     {
         const auto sign = value.data() >> 31U;
-        const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> 23U) & 0xFFU) - 127;
+        const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias;
         const auto significand = value.data() & 0x1FFFFFU;
 
         std::string result;
@@ -188,6 +188,34 @@ namespace edl
         }
     }
 
+    template<class T> class numeric_limits;
+
+    template<> class numeric_limits<decimal32>
+    {
+        static constexpr bool is_signed = true;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr bool has_infinity = true;
+
+        static constexpr decimal32 min() noexcept { return decimal32{1, 0}; }
+    };
+
+    template<> class numeric_limits<decimal64>
+    {
+        static constexpr bool is_signed = true;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr bool has_infinity = true;
+
+        static constexpr decimal64 min() noexcept { return decimal64{1, 0}; }
+    };
+
+    template<std::size_t size>
+    constexpr bool isnormal(const decimal<size>& value)
+    {
+        const auto exponent = (value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask;
+        return exponent != traits<size>::exponent_mask;
+    }
     inline decimal32 stod32(const std::string& str, std::size_t* pos = nullptr)
     {
         std::size_t i = 0U;

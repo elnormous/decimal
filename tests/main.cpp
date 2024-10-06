@@ -5,6 +5,7 @@
 TEST_CASE("Default constructor")
 {
     edl::decimal32 d;
+    CHECK(isnormal(d));
     CHECK(d == 0);
     CHECK(d != 1);
     CHECK(d != -1);
@@ -18,6 +19,7 @@ TEST_CASE("Default constructor")
 TEST_CASE("Zero")
 {
     edl::decimal32 d{0, 0, false};
+    CHECK(isnormal(d));
     CHECK(d == 0);
     CHECK(d != 1);
     CHECK(d != -1);
@@ -31,6 +33,7 @@ TEST_CASE("Zero")
 TEST_CASE("One")
 {
     edl::decimal32 d{1, 0, false};
+    CHECK(isnormal(d));
     CHECK(d != 0);
     CHECK(d == 1);
     CHECK(d != -1);
@@ -44,6 +47,7 @@ TEST_CASE("One")
 TEST_CASE("Minus one")
 {
     edl::decimal32 d{-1, 0};
+    CHECK(isnormal(d));
     CHECK(d != 0);
     CHECK(d != 1);
     CHECK(d == -1);
@@ -59,6 +63,7 @@ TEST_CASE("Minus one")
 TEST_CASE("Minus two")
 {
     edl::decimal32 d{-2};
+    CHECK(isnormal(d));
     CHECK(d != 0);
     CHECK(d != 1);
     CHECK(d != -1);
