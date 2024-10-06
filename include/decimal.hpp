@@ -141,9 +141,9 @@ namespace edl
     template<std::size_t size>
     inline std::string to_string(const decimal<size>& value)
     {
-        const auto sign = value.data() >> 31U;
+        const auto sign = value.data() >> traits<size>::sign_offset;
         const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias;
-        const auto significand = value.data() & 0x1FFFFFU;
+        const auto significand = value.data() & traits<size>::significand_mask;
 
         std::string result;
         if (sign) result += '-';
