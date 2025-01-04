@@ -91,10 +91,10 @@ namespace edl
             const auto other_exponent = other.exponent();
             const auto other_significand = other.significand();
 
-            if (self_significand == 0)
+            if (self_significand == 0U)
                 return other;
 
-            if (other_significand == 0)
+            if (other_significand == 0U)
                 return *this;
 
             if (self_exponent == other_exponent)
@@ -115,10 +115,10 @@ namespace edl
             const auto other_exponent = other.exponent();
             const auto other_significand = other.significand();
 
-            if (self_significand == 0)
+            if (self_significand == 0U)
                 return decimal{other_sign ? static_cast<signed_type>(other_significand) : -static_cast<signed_type>(other_significand), self_exponent};
 
-            if (other_significand == 0)
+            if (other_significand == 0U)
                 return *this;
 
             if (self_exponent == other_exponent)
@@ -166,7 +166,7 @@ namespace edl
             if (exponent < 0 && point <= 0)
             {
                 result += "0.";
-                for (int i = point; i < 0; ++i) result += '0';
+                for (std::int32_t i = point; i < 0; ++i) result += '0';
             }
 
             for (std::uint32_t i = 0U, f = significand; i < digits; ++i)
@@ -180,7 +180,7 @@ namespace edl
 
             if (point > 0)
             {
-                for (int i = 0; i < exponent; ++i) result += '0';
+                for (std::int32_t i = 0; i < exponent; ++i) result += '0';
                 if (static_cast<std::uint32_t>(point) >= digits) result += ".0";
             }
 
