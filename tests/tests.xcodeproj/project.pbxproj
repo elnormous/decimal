@@ -211,7 +211,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
+					/opt/homebrew/include,
 					../include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
@@ -290,7 +290,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
+					/opt/homebrew/include,
 					../include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
