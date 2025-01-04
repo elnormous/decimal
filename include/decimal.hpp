@@ -106,7 +106,7 @@ namespace edl
             const auto other_significand = other.significand();
 
             if (self_significand == 0)
-                return decimal{other_sign ? -static_cast<typename traits<size>::signed_type>(other_significand) : static_cast<typename traits<size>::signed_type>(other_significand), self_exponent};
+                return decimal{other_sign ? static_cast<typename traits<size>::signed_type>(other_significand) : -static_cast<typename traits<size>::signed_type>(other_significand), self_exponent};
 
             if (other_significand == 0)
                 return *this;
