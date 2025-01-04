@@ -35,13 +35,14 @@ namespace edl
         constexpr auto sign() const noexcept { return static_cast<bool>(d >> traits<size>::sign_offset); }
         constexpr auto exponent() const noexcept { return static_cast<typename traits<size>::signed_type>((d >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias; }
         constexpr auto significand() const noexcept { return d & traits<size>::significand_mask; }
+        constexpr auto value() const noexcept { return (d & traits<size>::significand_mask) ? -static_cast<typename traits<size>::signed_type>(significand()) : static_cast<typename traits<size>::signed_type>(significand()); }
 
         typename traits<size>::unsigned_type d = static_cast<typename traits<size>::unsigned_type>(traits<size>::exponent_bias) << traits<size>::exponent_offset;
 
     public:
         constexpr decimal() noexcept = default;
 
-        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp = 0) noexcept:
+        constexpr decimal(const typename traits<size>::signed_type value, const typename traits<size>::signed_type exp = 0) noexcept:
             d{
                 static_cast<typename traits<size>::unsigned_type>(value < 0 ? 0x01U : 0x00U) << traits<size>::sign_offset |
                 ((exp < 0 ?
@@ -71,7 +72,7 @@ namespace edl
             return result;
         }
 
-        [[nodiscard]] constexpr decimal operator+(decimal other) const noexcept
+        [[nodiscard]] constexpr decimal operator+(const decimal other) const noexcept
         {
             const auto self_sign = sign();
             const auto self_exponent = exponent();
@@ -95,7 +96,7 @@ namespace edl
             return *this;
         }
 
-        [[nodiscard]] constexpr decimal operator-(decimal other) const noexcept
+        [[nodiscard]] constexpr decimal operator-(const decimal other) const noexcept
         {
             const auto self_sign = sign();
             const auto self_exponent = exponent();
