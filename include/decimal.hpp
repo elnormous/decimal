@@ -55,7 +55,8 @@ namespace edl
                 static_cast<unsigned_type>(value < 0 ? 0x01U : 0x00U) << sign_offset |
                 ((exp < 0 ?
                   (exponent_bias - 1U - ~static_cast<unsigned_type>(exp)) :
-                  (static_cast<unsigned_type>(exp) + exponent_bias)) & exponent_mask) << exponent_offset | (static_cast<unsigned_type>(value >= 0 ? value : -value) & significand_mask)
+                  (static_cast<unsigned_type>(exp) + exponent_bias)) & exponent_mask) << exponent_offset |
+                (static_cast<unsigned_type>(value >= 0 ? value : -value) & significand_mask)
             }
         {
         }
@@ -140,7 +141,7 @@ namespace edl
     template<std::size_t size>
     inline std::string to_string(const decimal<size>& value)
     {
-        const auto sign = value.data() >> traits<size>::sign_offset;
+        const auto sign = static_cast<bool>(value.data() >> traits<size>::sign_offset);
         const auto exponent = static_cast<typename traits<size>::signed_type>((value.data() >> traits<size>::exponent_offset) & traits<size>::exponent_mask) - traits<size>::exponent_bias;
         const auto significand = value.data() & traits<size>::significand_mask;
 
