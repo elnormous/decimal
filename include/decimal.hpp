@@ -41,23 +41,13 @@ namespace edl
     public:
         constexpr decimal() noexcept = default;
 
-        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp) noexcept:
-            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), exp, value < 0}
-        {
-        }
-
-        constexpr decimal(typename traits<size>::unsigned_type signif, typename traits<size>::signed_type exp, bool sig) noexcept:
+        constexpr decimal(typename traits<size>::signed_type value, typename traits<size>::signed_type exp = 0) noexcept:
             d{
-                static_cast<typename traits<size>::unsigned_type>(sig ? 0x01U : 0x00U) << traits<size>::sign_offset |
+                static_cast<typename traits<size>::unsigned_type>(value < 0 ? 0x01U : 0x00U) << traits<size>::sign_offset |
                 ((exp < 0 ?
                   (traits<size>::exponent_bias - 1U - ~static_cast<typename traits<size>::unsigned_type>(exp)) :
-                  (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (signif & traits<size>::significand_mask)
+                  (static_cast<typename traits<size>::unsigned_type>(exp) + traits<size>::exponent_bias)) & traits<size>::exponent_mask) << traits<size>::exponent_offset | (static_cast<typename traits<size>::unsigned_type>(value >= 0 ? value : -value) & traits<size>::significand_mask)
             }
-        {
-        }
-
-        constexpr decimal(typename traits<size>::signed_type value) noexcept:
-            decimal{value < 0 ? ~static_cast<typename traits<size>::unsigned_type>(value) + 0x01U : static_cast<typename traits<size>::unsigned_type>(value), 0U, value < 0}
         {
         }
 
@@ -116,7 +106,7 @@ namespace edl
             const auto other_significand = other.significand();
 
             if (self_significand == 0)
-                return decimal{other_significand, self_exponent, !other_sign};
+                return decimal{other_sign ? -static_cast<typename traits<size>::signed_type>(other_significand) : static_cast<typename traits<size>::signed_type>(other_significand), self_exponent};
 
             if (other_significand == 0)
                 return *this;
@@ -257,7 +247,7 @@ namespace edl
 
         if (pos) *pos = i;
 
-        return decimal32{significand, exponent, sign};
+        return decimal32{sign ? -static_cast<traits<32U>::signed_type>(significand) : static_cast<traits<32U>::signed_type>(significand), exponent};
     }
 }
 
