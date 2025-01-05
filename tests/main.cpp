@@ -20,6 +20,13 @@ TEST_CASE("Comparison")
 {
     CHECK(edl::decimal32(0) == edl::decimal32(0));
     CHECK_FALSE(edl::decimal32(0) == edl::decimal32(1));
+    CHECK_FALSE(edl::decimal32(0, 1) == edl::decimal32(0, 2));
+}
+
+TEST_CASE("Inequality")
+{
+    CHECK(edl::decimal32(0) != edl::decimal32(1));
+    CHECK_FALSE(edl::decimal32(0) != edl::decimal32(0));
 }
 
 TEST_CASE("Zero")
