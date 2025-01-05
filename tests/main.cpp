@@ -16,6 +16,12 @@ TEST_CASE("Default constructor")
     CHECK((d.data() & 0x1FFFFFU) == 0U); // fraction
 }
 
+TEST_CASE("Comparison")
+{
+    CHECK(edl::decimal32(0) == edl::decimal32(0));
+    CHECK_FALSE(edl::decimal32(0) == edl::decimal32(1));
+}
+
 TEST_CASE("Zero")
 {
     edl::decimal32 d{0, 0};
